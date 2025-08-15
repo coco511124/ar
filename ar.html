@@ -1,0 +1,37 @@
+<!-- 1) 直接掛 <script> 就能在 HTML 用 -->
+  <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+  <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
+  
+  <body style="margin:0; overflow:hidden">
+    <a-scene embedded
+             arjs="trackingMethod: best; sourceType: webcam;"
+             renderer="antialias: true"
+             cursor="rayOrigin: mouse"
+             raycaster="objects: .clickable">
+      <!-- 2) 你的影像目標（NFT/Image Tracking） -->
+      <a-nft type="nft" url="targets/test" smooth="true">
+        <!-- 3) 可點擊的平面，初始材質 img1 -->
+        <a-plane class="clickable" id="swapPlane"
+                 width="1" height="1"
+                 material="src: #img1" position="0 0 0.01">
+        </a-plane>
+      </a-nft>
+      <a-entity camera></a-entity>
+  
+      <!-- 預載兩張圖 -->
+      <a-assets>
+        <img id="img1" src="img/img1.jpg">
+        <img id="img2" src="img/img2.jpeg">
+      </a-assets>
+    </a-scene>
+  
+    <script>
+      const plane = document.getElementById('swapPlane');
+      let toggled = false;
+      plane.addEventListener('click', () => {
+        plane.setAttribute('material', 'src', toggled ? '#img1' : '#img2');
+        toggled = !toggled;
+      });
+    </script>
+  </body>
+  
