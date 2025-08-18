@@ -1,37 +1,70 @@
-<!-- 1) 直接掛 <script> 就能在 HTML 用 -->
-  <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
-  <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
-  
-  <body style="margin:0; overflow:hidden">
-    <a-scene embedded
-             arjs="trackingMethod: best; sourceType: webcam;"
-             renderer="antialias: true"
-             cursor="rayOrigin: mouse"
-             raycaster="objects: .clickable">
-      <!-- 2) 你的影像目標（NFT/Image Tracking） -->
-      <a-nft type="nft" url="targets/test" smooth="true">
-        <!-- 3) 可點擊的平面，初始材質 img1 -->
-        <a-plane class="clickable" id="swapPlane"
-                 width="1" height="1"
-                 material="src: #img1" position="0 0 0.01">
-        </a-plane>
-      </a-nft>
-      <a-entity camera></a-entity>
-  
-      <!-- 預載兩張圖 -->
-      <a-assets>
-        <img id="img1" src="img/img1.jpg">
-        <img id="img2" src="img/img2.jpeg">
-      </a-assets>
-    </a-scene>
-  
-    <script>
-      const plane = document.getElementById('swapPlane');
-      let toggled = false;
-      plane.addEventListener('click', () => {
-        plane.setAttribute('material', 'src', toggled ? '#img1' : '#img2');
-        toggled = !toggled;
-      });
-    </script>
-  </body>
-  
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+  <script src="https://cdn.jsdelivr.net/npm/aframe@1.6.0/dist/aframe-master.min.js"></script>
+
+  <style>
+    .arjs-loader {
+      height: 100%;
+      width: 100%;
+      position: absolute;
+      top: 0; left: 0;
+      background-color: rgba(0, 0, 0, 0.8);
+      z-index: 9999;
+      display: flex; justify-content: center; align-items: center;
+    }
+    .arjs-loader div {
+      text-align: center; font-size: 1.25em; color: white;
+    }
+    html, body { margin: 0; overflow: hidden; }
+  </style>
+
+  <!-- rawgithack development URL -->
+  <script src='https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js'></script>
+  <!--<script src='../../../../aframe/build/aframe-ar-nft.js'></script>-->
+</head>
+
+<body style='margin:0; overflow:hidden;'>
+  <!-- minimal loader shown until image descriptors are loaded -->
+  <div class="arjs-loader" id="arjs-loader">
+    <div>Loading, please wait...</div>
+  </div>
+
+  <a-scene
+    vr-mode-ui="enabled: false;"
+    renderer="logarithmicDepthBuffer: true; precision: medium;"
+    embedded
+    arjs="trackingMethod: best; sourceType: webcam; debugUIEnabled: false;">
+
+    <!-- 改為你的 NFT 目標：不要加副檔名 -->
+    <a-nft
+      type="nft"
+      url="./targets/img2"
+      smooth="true" smoothCount="10" smoothTolerance="0.01" smoothThreshold="5">
+
+      <!-- 在標記上疊 JPG；rotation -90 讓圖片貼在平面上 -->
+      <a-image
+        src="./img/img1.jpg"
+        width="1"
+        height="0.66"   <!-- 依你的 img2.jpg 比例調整；這裡先假設 3:2 -->
+        position="0 0 0"
+        rotation="-90 0 0">
+      </a-image>
+    </a-nft>
+
+    <a-entity camera></a-entity>
+  </a-scene>
+
+  <script>
+    // 讓載入畫面在可用時關閉（避免一直遮住）
+    const loader = document.getElementById('arjs-loader');
+    window.addEventListener('arjs-video-loaded', () => loader.style.display = 'none');
+    window.addEventListener('arjs-nft-loaded', () => loader.style.display = 'none');
+    document.querySelector('a-scene').addEventListener('loaded', () => {
+      setTimeout(() => { loader.style.display = 'none'; }, 1500);
+    });
+  </script>
+</body>
+</html>
